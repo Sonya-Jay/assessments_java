@@ -1,0 +1,49 @@
+<div class="assessments">
+  <h1 class="header">
+    University of Rhode Island Change Assessment Scale (URICA)
+  </h1>
+  <p class="instructions">
+    Select the option that best describes how much you agree or disagree with
+    the statement.
+  </p>
+  <div class="questions-container">
+    <div class="question-page">
+      <input 
+      type="number" 
+      id="userId" 
+      [(ngModel)]="userId"
+      placeholder="Enter User ID"
+      [disabled]="answersLocked"
+      required
+    >
+      <div *ngFor="let question of questions; let i = index">
+        <div class="question-box">
+          <label class="question-text">{{ question }}</label>
+          <div class="answer-buttons">
+            <button
+              *ngFor="let option of answerOptions[i]"
+              class="answer-button"
+              [class.selected]="answers[i] === option.value"
+              [disabled]="answersLocked"
+              (click)="answers[i] = option.value"
+            >
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="button-container">
+        <button
+          *ngIf="!showResults"
+          (click)="submitAnswers()"
+          [disabled]="!allQuestionsAnswered()"
+        >
+          Submit
+        </button>
+      </div>
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,44 @@
+.homepage {
+    overflow-y: hidden;
+    height: 100vh;
+    width: 100vw;
+    align-items: center;
+    justify-content: center;
+    background-color: aliceblue;
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+  font-size: 3rem;
+  align-self: center;
+  margin-bottom: 40px;
+  color: #2894f4;
+  text-align: center;
+}
+
+.same-row {
+    display: flex;
+    flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 50px;
+  margin-bottom: 150px;
+}
+
+.assessment-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 20px;
+  font-size: 2rem;
+  background-color: #2894f4;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  height: 100px;
+  width: 300px;
+}

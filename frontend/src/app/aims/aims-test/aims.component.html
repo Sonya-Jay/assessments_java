@@ -1,0 +1,61 @@
+<div class="assessments">
+  <h1 class="header">Abnormal Involuntary Movement Scale (AIMS)</h1>
+  <p class="instructions">
+    Select the option that best describes how mild to severe patient symptoms
+    are after examination.
+  </p>
+  <div class="questions-container">
+    <div class="question-page">
+      <div class="user-id-input">
+      <input 
+        type="number" 
+        id="userId" 
+        [(ngModel)]="userId"
+        placeholder="Enter User ID"
+        [disabled]="answersLocked"
+        required
+      >
+      <input 
+      type="date" 
+      id="dateTaken" 
+      [(ngModel)]="dateTaken"
+      [disabled]="answersLocked"
+      required
+    >
+    </div>
+      <div *ngFor="let question of questions; let i = index">
+        <div class="question-box">
+          <label class="question-text">{{ question }}</label>
+          <div class="answer-buttons">
+            <button
+              *ngFor="let option of answerOptions[i]"
+              class="answer-button"
+              [class.selected]="answers[i] === option.value"
+              [disabled]="answersLocked"
+              (click)="answers[i] = option.value"
+            >
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="button-container">
+        <button
+          *ngIf="!showResults"
+          (click)="submitAnswers()"
+          [disabled]="!allQuestionsAnswered()"
+        >
+          Submit
+        </button>
+      </div>
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+      <div class="results-container" *ngIf="showResults">
+        <h2>Assessment Results</h2>
+        <p class="result-text">{{ resultsText }}</p>
+        <button routerLink="">Back to Homepage</button>
+      </div>
+    </div>
+  </div>
+</div>

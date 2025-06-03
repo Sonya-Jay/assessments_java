@@ -8,9 +8,8 @@ describe('UricaComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [UricaComponent]
-    })
-    .compileComponents();
+      imports: [UricaComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(UricaComponent);
     component = fixture.componentInstance;

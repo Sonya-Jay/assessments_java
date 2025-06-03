@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UricaComponent } from './urica.component';
+import { AimsResultComponent } from './aims-result.component';
 
-describe('UricaComponent', () => {
-  let component: UricaComponent;
-  let fixture: ComponentFixture<UricaComponent>;
+describe('AimsResultComponent', () => {
+  let component: AimsResultComponent;
+  let fixture: ComponentFixture<AimsResultComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [UricaComponent]
+      imports: [AimsResultComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(UricaComponent);
+    fixture = TestBed.createComponent(AimsResultComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

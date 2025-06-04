@@ -1,16 +1,16 @@
-package com.assessments.backend;
+package com.assessments.backend.aims;
 
-public class CreateUricaQuestion {
+import com.assessments.backend.AnswerOptions;
+
+public class CreateAimsQuestion {
     private int questionNumber;
     private String question;
     private AnswerOptions[] options;
-    private String stage;
 
-    public CreateUricaQuestion(int questionNumber, String question, AnswerOptions[] options, String stage) {
+    public CreateAimsQuestion(int questionNumber, String question, AnswerOptions[] options) {
         this.questionNumber = questionNumber;
         this.question = question;
         this.options = options;
-        this.stage = stage;
     }
     public int getQuestionNumber() {
         return questionNumber;
@@ -29,11 +29,5 @@ public class CreateUricaQuestion {
     }
     public void setAnswerOptions(AnswerOptions[] options) {
         this.options = options;
-    }
-    public String getStage() {
-        return stage;
-    }
-    public void setStage(String stage) {
-        this.stage = stage;
     }
 }

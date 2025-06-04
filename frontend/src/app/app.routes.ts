@@ -10,7 +10,7 @@ export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'urica', component: UricaComponent },
   { path: 'aims', component: AimsComponent },
-  { path: 'urica/result', component: UricaResultComponent },
+  { path: 'urica/result/:userId', component: UricaResultComponent },
   { path: 'aims/result/:userId', component: AimsResultComponent }
 ];
 

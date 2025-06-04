@@ -1,4 +1,4 @@
-package com.assessments.backend;
+package com.assessments.backend.aims;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
@@ -116,8 +116,4 @@ public class AimsResult {
     public int[] getAllQuestions() {
         return new int[] {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12};
     }
-
-    
-
-    
 }

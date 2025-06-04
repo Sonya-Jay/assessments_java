@@ -1,4 +1,5 @@
 package com.assessments.backend;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -10,16 +11,26 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.assessments.backend.aims.AimsProcedure;
+import com.assessments.backend.aims.AimsQuestions;
+import com.assessments.backend.aims.AimsResult;
+import com.assessments.backend.aims.AimsResultRepository;
+import com.assessments.backend.aims.AimsScorer;
+import com.assessments.backend.urica.UricaQuestions;
+import com.assessments.backend.urica.UricaResult;
+import com.assessments.backend.urica.UricaResultRepository;
+import com.assessments.backend.urica.UricaScorer;
+
 @RestController
 @RequestMapping("/assessments")
 public class AssessmentController {
-    
+
     @GetMapping("/aims-procedure")
     public String[] getAimsProcedure() {
         AimsProcedure procedure = new AimsProcedure();
         return procedure.procedure();
     }
-    
+
     @GetMapping("/aims-questions")
     public String[] getAimsQuestions() {
         AimsQuestions aimsAllQuestions = new AimsQuestions();
@@ -43,7 +54,7 @@ public class AssessmentController {
         AimsScorer aimsScorer = new AimsScorer();
         return aimsScorer.calculateScore(answers);
     }
-    
+
     @GetMapping("/urica-questions")
     public String[] getUricaQuestions() {
         UricaQuestions uricaAllQuestions = new UricaQuestions();
@@ -65,29 +76,27 @@ public class AssessmentController {
     @Autowired
     private AimsResultRepository aimsRepo;
 
-     @Autowired
-     private UricaResultRepository uricaRepo;
+    @Autowired
+    private UricaResultRepository uricaRepo;
 
-     @PostMapping("/aims-results")
-     public AimsResult saveResult(@RequestBody AimsResult result) {
+    @PostMapping("/aims-results")
+    public AimsResult saveResult(@RequestBody AimsResult result) {
         return aimsRepo.save(result);
-     }
+    }
 
-     @GetMapping("/aims-results/{userId}")
-     public List<AimsResult> getAimsResultsByUser(@PathVariable int userId) {
+    @GetMapping("/aims-results/{userId}")
+    public List<AimsResult> getAimsResultsByUser(@PathVariable int userId) {
         return aimsRepo.findByUserId(userId);
-     }
+    }
 
-       @PostMapping("/urica-results")
-     public UricaResult saveResult(@RequestBody UricaResult result) {
-        result.setDateTaken(LocalDateTime.now());
+    @PostMapping("/urica-results")
+    public UricaResult saveResult(@RequestBody UricaResult result) {
         return uricaRepo.save(result);
-     }
+    }
 
-     @GetMapping("/urica-results/{userId}")
-     public List<UricaResult> getUricaResultsByUser(@PathVariable int userId) {
+    @GetMapping("/urica-results/{userId}")
+    public List<UricaResult> getUricaResultsByUser(@PathVariable int userId) {
         return uricaRepo.findByUserId(userId);
-     }
-
+    }
 
 }

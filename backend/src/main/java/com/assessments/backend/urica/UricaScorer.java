@@ -1,4 +1,4 @@
-package com.assessments.backend;
+package com.assessments.backend.urica;
 
 public class UricaScorer {
     public String calculateScore(int[] answers) {
@@ -12,10 +12,13 @@ public class UricaScorer {
             }
         }
 
-        int precontemplationScore = answers[0] + answers[4] + answers[10] + answers[12] + answers[22] + answers[25] + answers[28];
-        int contemplationScore = answers[1] + answers[7] + answers[11] + answers[14]  + answers[18] + answers[20]  + answers[23];
+        int precontemplationScore = answers[0] + answers[4] + answers[10] + answers[12] + answers[22] + answers[25]
+                + answers[28];
+        int contemplationScore = answers[1] + answers[7] + answers[11] + answers[14] + answers[18] + answers[20]
+                + answers[23];
         int actionScore = answers[2] + answers[6] + answers[9] + answers[13] + answers[16] + answers[24] + answers[29];
-        int maintenanceScore = answers[5] + answers[15] + answers[17] + answers[21] + answers[26] + answers[27] + answers[31];
+        int maintenanceScore = answers[5] + answers[15] + answers[17] + answers[21] + answers[26] + answers[27]
+                + answers[31];
 
         double meanPrecontemplation = (precontemplationScore + 7) / 7;
         double meanContemplation = (contemplationScore + 7) / 7;

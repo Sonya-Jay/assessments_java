@@ -1,4 +1,4 @@
-package com.assessments.backend;
+package com.assessments.backend.aims;
 
 import java.util.List;
 

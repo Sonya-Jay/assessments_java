@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { ServiceService } from '../../shared/service.service';
 import { PredictionService } from '../../shared/prediction.service';
 import { ActivatedRoute } from '@angular/router';
@@ -17,23 +18,21 @@ import {
   ScaleOptionsByType,
   CartesianScaleTypeRegistry,
   Point,
-  ChartTypeRegistry
+  ChartTypeRegistry,
 } from 'chart.js';
 import { provideCharts, BaseChartDirective } from 'ng2-charts';
 import { FormsModule } from '@angular/forms';
 import { isNullOrUndef } from 'chart.js/helpers';
 import 'chartjs-adapter-date-fns';
-
-// Register Chart.js components
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-aims-result',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective, FormsModule],
+  imports: [CommonModule, RouterModule, BaseChartDirective, FormsModule],
   providers: [provideCharts()],
   templateUrl: './aims-result.component.html',
-  styleUrls: ['./aims-result.component.css'],
+  styleUrls: ['../../shared/results.component.css'],
 })
 export class AimsResultComponent implements OnInit {
   userId: number | null = null;
@@ -47,7 +46,6 @@ export class AimsResultComponent implements OnInit {
   totalScoreChart: ChartConfiguration | null = null;
   totalScorePlugins: Plugin[] = [];
   showPredictions: boolean = false;
-  predictionDays: number = 30;
 
   public lineChartType: ChartType = 'line';
 
@@ -70,8 +68,6 @@ export class AimsResultComponent implements OnInit {
   loadChartData() {
     if (this.userId) {
       this.loadUserResults(this.userId);
-    } else {
-      this.errorMessage = 'Please enter a User ID';
     }
   }
 
@@ -99,42 +95,40 @@ export class AimsResultComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    // First load the questions
+    // Getting questions
     this.service.getAimsQuestions().subscribe({
       next: (questions: string[]) => {
         this.aimsQuestions = questions;
-        // Then load the results
+
         this.service.getAimsResultsByUser(userId).subscribe({
           next: (results) => {
             if (results && results.length > 0) {
               results.sort(
                 (a, b) =>
-                  new Date(a.dateTaken).getTime() - new Date(b.dateTaken).getTime()
+                  new Date(a.dateTaken).getTime() -
+                  new Date(b.dateTaken).getTime()
               );
 
-              // Prepare data for prediction
               const pastData = results.map((r) => ({
                 date: new Date(r.dateTaken),
                 score: r.totalScore,
               }));
 
-              // Generate prediction series if we have enough data points
-               let predictionData: { date: Date; score: number } | null = null;
+              // Get prediction if theres enough data
+              let predictionData: { date: Date; score: number } | null = null;
               if (results.length >= 2 && this.showPredictions) {
                 try {
-                  const predictionResult = this.predictionService.predictNextScore(pastData, this.predictionDays);
+                  const predictionResult =
+                    this.predictionService.predictNextScore(pastData, 28);
                   predictionData = {
                     date: predictionResult.predictionDate,
-                    score: predictionResult.predictedScore
+                    score: predictionResult.predictedScore,
                   };
-                  console.log('Prediction result:', predictionResult);
-                  console.log('Prediction data:', predictionData);
                 } catch (error) {
                   console.error('Error generating predictions:', error);
                 }
               }
 
-              // Create background zone plugin
               const backgroundZonePlugin: Plugin = {
                 id: 'backgroundZones',
                 beforeDraw: (chart) => {
@@ -144,7 +138,8 @@ export class AimsResultComponent implements OnInit {
 
                   if (!yScale) return;
 
-                  const getY = (value: number) => yScale.getPixelForValue(value);
+                  const getY = (value: number) =>
+                    yScale.getPixelForValue(value);
 
                   ctx.fillStyle = 'rgb(90, 158, 124)';
                   ctx.fillRect(
@@ -180,37 +175,44 @@ export class AimsResultComponent implements OnInit {
                 },
               };
 
-              const originalDates = results.map((r) => new Date(r.dateTaken));
-              const originalScores = results.map((r) => r.totalScore);
+              let originalDates: (Date | null)[] = results.map(
+                (r) => new Date(r.dateTaken)
+              );
+              let originalScores = results.map((r) => r.totalScore);
 
-              // Create datasets array with actual and prediction data
-              const datasets: ChartDataset<'line', (number | null)[]>[] = [{
-                label: 'Actual Score',
-                data: originalScores,
-                borderColor: 'rgb(255, 255, 255)',
-                pointBackgroundColor: 'rgb(0, 0, 0)',
-                pointBorderColor: 'rgb(255, 255, 255)',
-                pointHoverBackgroundColor: 'rgb(255, 255, 255)',
-                pointHoverBorderColor: 'rgb(0, 0, 0)',
-                fill: false,
-                tension: 0.4,
-                borderWidth: 2,
-              }];
+              if (originalScores.length === 1) {
+                originalScores = [originalScores[0], originalScores[0]];
+                originalDates = [null, originalDates[0]];
+              }
 
-              // Add prediction dataset if available
+              const datasets: ChartDataset<'line', (number | null)[]>[] = [
+                {
+                  label: 'Total Score',
+                  data: originalScores,
+                  borderColor: 'rgb(255, 255, 255)',
+                  pointBackgroundColor: 'rgb(0, 0, 0)',
+                  pointBorderColor: 'rgb(255, 255, 255)',
+                  pointHoverBackgroundColor: 'rgb(255, 255, 255)',
+                  pointHoverBorderColor: 'rgb(0, 0, 0)',
+                  fill: false,
+                  tension: 0.4,
+                  borderWidth: 2,
+                },
+              ];
+
               if (predictionData) {
-                console.log('Adding prediction dataset');
-                // Add the last actual point to connect the lines
-                const lastActualScore = originalScores[originalScores.length - 1];
-                
-                // Create a new array with the last actual score and prediction
-                // We need to pad the array with null values to align with the actual data points
-                const predictionScores = new Array(originalScores.length - 1).fill(null);
+                const lastActualScore =
+                  originalScores[originalScores.length - 1];
+
+                const predictionScores = new Array(
+                  originalScores.length - 1
+                ).fill(null);
                 predictionScores.push(lastActualScore, predictionData.score);
-                
-                console.log('Prediction scores:', predictionScores);
-                
-                const predictionDataset: ChartDataset<'line', (number | null)[]> = {
+
+                const predictionDataset: ChartDataset<
+                  'line',
+                  (number | null)[]
+                > = {
                   label: 'Predicted Score',
                   data: predictionScores,
                   borderColor: 'rgb(255, 255, 255)',
@@ -221,24 +223,22 @@ export class AimsResultComponent implements OnInit {
                   fill: false,
                   tension: 0.4,
                   borderWidth: 2,
-                  pointRadius: [0, 0, 4], // Hide points for padding and connecting line, show point for prediction
+                  pointRadius: [0, 0, 4],
                   pointHoverRadius: [0, 0, 6],
-                  borderDash: [5, 5], // Add dashed line style
+                  borderDash: [5, 5],
                   segment: {
-                    borderDash: (ctx) => [5, 5], // Ensure dashed line style is applied
+                    borderDash: (ctx) => [5, 5],
                   },
-                  spanGaps: true, // Allow gaps in the data (null values)
+                  spanGaps: true,
                 };
-                
+
                 datasets.push(predictionDataset);
-                console.log('Final datasets:', datasets);
               }
 
-              // Combine all dates for labels
               const allDates = [
                 ...originalDates,
-                ...(predictionData ? [predictionData.date] : [])
-              ].map(d => d.toLocaleDateString());
+                ...(predictionData ? [predictionData.date] : []),
+              ].map((d) => (d ? d.toLocaleDateString() : ''));
 
               console.log('All dates for labels:', allDates);
 
@@ -246,7 +246,7 @@ export class AimsResultComponent implements OnInit {
                 type: 'line',
                 data: {
                   labels: allDates,
-                  datasets: datasets
+                  datasets: datasets,
                 },
                 options: {
                   responsive: true,
@@ -262,10 +262,11 @@ export class AimsResultComponent implements OnInit {
                       callbacks: {
                         label: function (context) {
                           const value = context.parsed.y;
-                          const isPrediction = context.dataset.label === 'Predicted Score';
-                          return `${context.dataset.label}: ${value.toFixed(1)}${
-                            isPrediction ? ' (predicted)' : ''
-                          }`;
+                          const isPrediction =
+                            context.dataset.label === 'Predicted Score';
+                          return `${context.dataset.label}: ${value.toFixed(
+                            1
+                          )}${isPrediction ? ' (predicted)' : ''}`;
                         },
                       },
                     },
@@ -275,10 +276,10 @@ export class AimsResultComponent implements OnInit {
                       title: {
                         display: true,
                         text: 'Date',
-                        color: 'black'
+                        color: 'black',
                       },
                       ticks: { color: 'black' },
-                      grid: { color: 'rgba(0, 0, 0, 0.1)' }
+                      grid: { color: 'rgba(0, 0, 0, 0.1)' },
                     },
                     y: {
                       min: 0,
@@ -286,16 +287,16 @@ export class AimsResultComponent implements OnInit {
                       title: {
                         display: true,
                         text: 'Score',
-                        color: 'black'
-                      },
-                      ticks: { 
                         color: 'black',
-                        stepSize: 4
                       },
-                      grid: { color: 'rgba(0, 0, 0, 0.1)' }
-                    }
-                  }
-                }
+                      ticks: {
+                        color: 'black',
+                        stepSize: 4,
+                      },
+                      grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                    },
+                  },
+                },
               };
 
               this.totalScorePlugins = [backgroundZonePlugin];
@@ -303,7 +304,9 @@ export class AimsResultComponent implements OnInit {
               this.questionCharts = [];
               for (let i = 0; i < 12; i++) {
                 let scores = results.map((r) => r.allQuestions[i]);
-                let labels = results.map((r) => new Date(r.dateTaken).toLocaleDateString());
+                let labels = results.map((r) =>
+                  new Date(r.dateTaken).toLocaleDateString()
+                );
 
                 if (scores.length === 1) {
                   scores = [scores[0], scores[0]];
@@ -349,14 +352,14 @@ export class AimsResultComponent implements OnInit {
                       color: 'black',
                       font: {
                         size: 12,
-                        weight: 'normal'
+                        weight: 'normal',
                       },
                       padding: {
                         top: 20,
-                        bottom: 20
+                        bottom: 20,
                       },
                       align: 'center',
-                      position: 'top'
+                      position: 'top',
                     },
                     tooltip: {
                       enabled: true,
@@ -372,14 +375,16 @@ export class AimsResultComponent implements OnInit {
                     x: {
                       type: 'category',
                       ticks: { color: 'black' },
-                      grid: { color: 'rgba(0, 0, 0, 0.1)' },                
+                      grid: { color: 'rgba(0, 0, 0, 0.1)' },
                     },
                     y: {
                       type: 'linear',
                       ticks: {
                         color: 'black',
                         stepSize: 1,
-                        callback: function (tickValue: number | string): string {
+                        callback: function (
+                          tickValue: number | string
+                        ): string {
                           return tickValue.toString();
                         },
                       },
@@ -416,15 +421,7 @@ export class AimsResultComponent implements OnInit {
 
   togglePredictions() {
     this.showPredictions = !this.showPredictions;
-    console.log('Toggled predictions:', this.showPredictions);
     if (this.userId) {
-      this.loadUserResults(this.userId);
-    }
-  }
-
-  updatePredictionDays(days: number) {
-    this.predictionDays = days;
-    if (this.userId && this.showPredictions) {
       this.loadUserResults(this.userId);
     }
   }

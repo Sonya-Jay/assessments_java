@@ -14,7 +14,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class AimsComponent implements OnInit {
   userId: number | null = null;
-  dateTaken: string = new Date().toISOString().split('T')[0]; // Default to today's date
+  dateTaken: string = new Date().toISOString().split('T')[0];
   questions: string[] = [];
   answerOptions: { value: number; label: string }[][] = Array(12).fill([]);
   answers: (number | null)[] = Array(12).fill(null);
@@ -22,7 +22,6 @@ export class AimsComponent implements OnInit {
   resultsText = '';
   errorMessage = '';
   answersLocked = false;
-
 
   constructor(private aimsService: ServiceService, private router: Router) {}
 
@@ -47,7 +46,7 @@ export class AimsComponent implements OnInit {
           },
           error: (error) => {
             this.errorMessage = 'Error loading AIMS options.';
-          }
+          },
         });
       } else {
         this.aimsService.getAimsTwoOptions().subscribe({
@@ -56,14 +55,16 @@ export class AimsComponent implements OnInit {
           },
           error: (error) => {
             this.errorMessage = 'Error loading AIMS options.';
-          }
+          },
         });
       }
     }
   }
 
   allQuestionsAnswered(): boolean {
-    return this.answers.every((answer) => answer !== null) && this.userId !== null;
+    return (
+      this.answers.every((answer) => answer !== null) && this.userId !== null
+    );
   }
 
   submitAnswers() {
@@ -78,27 +79,29 @@ export class AimsComponent implements OnInit {
           this.resultsText = result;
           this.showResults = true;
           this.errorMessage = '';
-          
-          // Extract the score from the result string
+
           const scoreMatch = result.match(/Score: (\d+)/);
           const totalScore = scoreMatch ? parseInt(scoreMatch[1]) : 0;
-          
-          // Save the results with the selected date
-          this.aimsService.saveAimsResult({
-            userId: this.userId!,
-            totalScore: totalScore,
-            answers: this.answers.map(answer => answer !== null ? answer : 0),
-            dateTaken: this.dateTaken // Include the selected date
-          }).subscribe({
-            next: () => {
-              this.router.navigate(['/aims/result', this.userId]);
-            },
-            error: (error: Error) => {
-              this.errorMessage = error.message;
-              this.showResults = false;
-              this.answersLocked = false;
-            }
-          });
+
+          this.aimsService
+            .saveAimsResult({
+              userId: this.userId!,
+              totalScore: totalScore,
+              answers: this.answers.map((answer) =>
+                answer !== null ? answer : 0
+              ),
+              dateTaken: this.dateTaken,
+            })
+            .subscribe({
+              next: () => {
+                this.router.navigate(['/aims/result', this.userId]);
+              },
+              error: (error: Error) => {
+                this.errorMessage = error.message;
+                this.showResults = false;
+                this.answersLocked = false;
+              },
+            });
         },
         error: (error: Error) => {
           this.errorMessage = error.message;
@@ -107,7 +110,8 @@ export class AimsComponent implements OnInit {
         },
       });
     } else {
-      this.errorMessage = 'Please enter a User ID and answer all questions before submitting.';
+      this.errorMessage =
+        'Please enter a User ID and answer all questions before submitting.';
     }
   }
 }

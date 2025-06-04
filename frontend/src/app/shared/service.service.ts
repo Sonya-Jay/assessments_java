@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
-import { AssessmentResult } from './models/results.interface';
+import { AssessmentResult } from './results.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -76,13 +76,12 @@ export class ServiceService {
   }
 
   saveAimsResult(result: { userId: number; totalScore: number; answers: number[]; dateTaken: string }): Observable<any> {
-    // Format the date string to include time component (midnight)
-    const formattedDate = `${result.dateTaken}T00:00:00`;
+    const addDateTime = `${result.dateTaken}T00:00:00`;
     
     const aimsResult = {
       userId: result.userId,
       totalScore: result.totalScore,
-      dateTaken: formattedDate, // Send date with time component
+      dateTaken: addDateTime,
       q1: result.answers[0],
       q2: result.answers[1],
       q3: result.answers[2],
@@ -108,11 +107,12 @@ export class ServiceService {
     );
   }
 
-  saveUricaResult(result: { userId: number; totalScore: number; answers: number[] }): Observable<any> {
+  saveUricaResult(result: { userId: number; totalScore: number; answers: number[]; dateTaken: string }): Observable<any> {
+    const addDateTime = `${result.dateTaken}T00:00:00`;
     const uricaResult = {
       userId: result.userId,
       totalScore: result.totalScore,
-      dateTaken: new Date(),
+      dateTaken: addDateTime,
       q1: result.answers[0],
       q2: result.answers[1],
       q3: result.answers[2],
@@ -170,6 +170,15 @@ export class ServiceService {
     return this.http.get<AssessmentResult[]>(`${this.baseUrl}/aims-results/${userId}`).pipe(
       catchError((error: HttpErrorResponse) => {
         const errorMessage = error.error?.message || error.error || 'Error fetching AIMS results';
+        return throwError(() => new Error(errorMessage));
+      })
+    );
+  }
+
+  getUricaResultsByUser(userId: number): Observable<AssessmentResult[]> {
+    return this.http.get<AssessmentResult[]>(`${this.baseUrl}/urica-results/${userId}`).pipe(
+      catchError((error: HttpErrorResponse) => {
+        const errorMessage = error.error?.message || error.error || 'Error fetching URICA results';
         return throwError(() => new Error(errorMessage));
       })
     );

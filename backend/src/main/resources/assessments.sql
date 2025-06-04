@@ -1,8 +1,7 @@
--- Aims Table Results
-
 CREATE DATABASE IF NOT EXISTS assessments;
 USE assessments;
 
+-- Aims Table Results
 CREATE TABLE IF NOT EXISTS aims_results (
 	id		INT	AUTO_INCREMENT PRIMARY KEY,
     user_id		INT NOT NULL,

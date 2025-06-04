@@ -7,22 +7,22 @@
   <div class="questions-container">
     <div class="question-page">
       <div class="user-id-input">
-      <input 
-        type="number" 
-        id="userId" 
-        [(ngModel)]="userId"
-        placeholder="Enter User ID"
-        [disabled]="answersLocked"
-        required
-      >
-      <input 
-      type="date" 
-      id="dateTaken" 
-      [(ngModel)]="dateTaken"
-      [disabled]="answersLocked"
-      required
-    >
-    </div>
+        <input
+          type="number"
+          id="userId"
+          [(ngModel)]="userId"
+          placeholder="Enter User ID"
+          [disabled]="answersLocked"
+          required
+        />
+        <input
+          type="date"
+          id="dateTaken"
+          [(ngModel)]="dateTaken"
+          [disabled]="answersLocked"
+          required
+        />
+      </div>
       <div *ngFor="let question of questions; let i = index">
         <div class="question-box">
           <label class="question-text">{{ question }}</label>
@@ -50,11 +50,6 @@
       </div>
       <div class="error-message" *ngIf="errorMessage">
         {{ errorMessage }}
-      </div>
-      <div class="results-container" *ngIf="showResults">
-        <h2>Assessment Results</h2>
-        <p class="result-text">{{ resultsText }}</p>
-        <button routerLink="">Back to Homepage</button>
       </div>
     </div>
   </div>

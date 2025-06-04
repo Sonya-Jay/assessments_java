@@ -38,10 +38,6 @@ body {
   justify-content: center;
   padding: 2rem;
   align-items: flex-start;
-  /* display: flex;
-  place-items: center; */
-  /* min-width: 320px;
-  min-height: 100vh; */
   background-color: aliceblue;
 }
 
@@ -60,6 +56,7 @@ button {
   background-color: #2894f4;
   cursor: pointer;
   transition: border-color 0.25s;
+  margin-top: 20px;
 }
 button:hover {
   border-color: #646cff;

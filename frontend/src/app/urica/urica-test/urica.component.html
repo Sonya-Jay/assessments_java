@@ -8,14 +8,23 @@
   </p>
   <div class="questions-container">
     <div class="question-page">
-      <input 
-      type="number" 
-      id="userId" 
-      [(ngModel)]="userId"
-      placeholder="Enter User ID"
-      [disabled]="answersLocked"
-      required
-    >
+      <div class="user-id-input">
+        <input
+          type="number"
+          id="userId"
+          [(ngModel)]="userId"
+          placeholder="Enter User ID"
+          [disabled]="answersLocked"
+          required
+        />
+        <input
+          type="date"
+          id="dateTaken"
+          [(ngModel)]="dateTaken"
+          [disabled]="answersLocked"
+          required
+        />
+      </div>
       <div *ngFor="let question of questions; let i = index">
         <div class="question-box">
           <label class="question-text">{{ question }}</label>

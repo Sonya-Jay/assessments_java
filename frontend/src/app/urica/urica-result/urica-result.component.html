@@ -1,1 +1,44 @@
-<p>urica-result works!</p>
+<div class="results-container">
+  <h2>URICA Assessment History</h2>
+
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="totalScoreChart && !isLoading" class="chart-controls">
+    <div class="prediction-controls">
+      <label>
+        <input
+          type="checkbox"
+          [checked]="showPredictions"
+          (change)="togglePredictions()"
+        />
+        Show Predictions
+      </label>
+    </div>
+  </div>
+
+  <div *ngIf="totalScoreChart && !isLoading" class="total-score-chart">
+    <canvas
+      baseChart
+      [data]="totalScoreChart.data"
+      [options]="totalScoreChart.options"
+      [type]="totalScoreChart.type"
+      [plugins]="totalScorePlugins"
+    >
+    </canvas>
+  </div>
+
+  <div *ngIf="questionCharts.length > 0 && !isLoading" class="charts-grid">
+    <div *ngFor="let chart of questionCharts" class="chart-wrapper">
+      <canvas
+        baseChart
+        [data]="chart.data"
+        [options]="chart.options"
+        [type]="lineChartType"
+      >
+      </canvas>
+    </div>
+  </div>
+  <button *ngIf="!isLoading && totalScoreChart" routerLink="">Back to Homepage</button>
+</div>

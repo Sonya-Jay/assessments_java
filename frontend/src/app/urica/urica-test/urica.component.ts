@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ServiceService } from '../../shared/service.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -12,8 +12,9 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './urica.component.html',
   styleUrls: ['../../shared/assessments.component.css'],
 })
-export class UricaComponent {
+export class UricaComponent implements OnInit {
   userId: number | null = null;
+  dateTaken: string = new Date().toISOString().split('T')[0];
   questions: string[] = [];
   answerOptions: { value: number; label: string }[][] = Array(32).fill([]);
   answers: (number | null)[] = Array(32).fill(null);
@@ -22,7 +23,9 @@ export class UricaComponent {
   errorMessage = '';
   answersLocked = false;
 
-  constructor(private uricaService: ServiceService, private router: Router) {
+  constructor(private uricaService: ServiceService, private router: Router) {}
+
+  ngOnInit() {
     this.uricaService.getUricaQuestions().subscribe({
       next: (data: string[]) => {
         this.questions = data;
@@ -48,15 +51,15 @@ export class UricaComponent {
   }
 
   allQuestionsAnswered(): boolean {
-    return this.answers.every((answer) => answer !== null);
+    return (
+      this.answers.every((answer) => answer !== null) && this.userId !== null
+    );
   }
 
   submitAnswers() {
     this.errorMessage = '';
     this.showResults = false;
     this.resultsText = '';
-
-    
 
     if (this.allQuestionsAnswered()) {
       this.answersLocked = true;
@@ -66,25 +69,28 @@ export class UricaComponent {
           this.showResults = true;
           this.errorMessage = '';
 
-          // Extract the score from the result string
           const scoreMatch = result.match(/Score: (\d+)/);
           const totalScore = scoreMatch ? parseInt(scoreMatch[1]) : 0;
-          
-          // Save the results
-          this.uricaService.saveUricaResult({
-            userId: this.userId!,
-            totalScore: totalScore,
-            answers: this.answers.map(answer => answer !== null ? answer : 0)
-          }).subscribe({
-            next: () => {
-              this.router.navigate(['/urica/result']);
-            },
-            error: (error: Error) => {
-              this.errorMessage = error.message;
-              this.showResults = false;
-              this.answersLocked = false;
-            }
-          });
+
+          this.uricaService
+            .saveUricaResult({
+              userId: this.userId!,
+              totalScore: totalScore,
+              answers: this.answers.map((answer) =>
+                answer !== null ? answer : 0
+              ),
+              dateTaken: this.dateTaken,
+            })
+            .subscribe({
+              next: () => {
+                this.router.navigate(['/urica/result', this.userId]);
+              },
+              error: (error: Error) => {
+                this.errorMessage = error.message;
+                this.showResults = false;
+                this.answersLocked = false;
+              },
+            });
         },
         error: (error: Error) => {
           this.errorMessage = error.message;
@@ -93,7 +99,8 @@ export class UricaComponent {
         },
       });
     } else {
-      this.errorMessage = 'Please enter a User ID and answer all questions before submitting.';
+      this.errorMessage =
+        'Please enter a User ID and answer all questions before submitting.';
     }
   }
 }
